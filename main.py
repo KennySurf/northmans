@@ -53,6 +53,26 @@ class EchoBot:
                 self.callback_f(call.message.chat.id, call.message.message_id, call.from_user.id)
             elif call.data in ('i_factions_enable', 'i_factions_disable'):
                 self.callback_setting(call, call.message.chat.id, call.from_user.id)
+            elif call.data == 'more_info':
+                self.callback_more_info(call.message.chat.id, call.message.message_id, call.from_user.id)
+            elif call.data == 'back_to_factions':
+                self.factions_index -= 1
+                self.callback_next_faction(call.message.chat.id, call.message.message_id, call.from_user.id)
+
+    def callback_more_info(self, chat_id, message_id, user_id):
+        if user_id != self.return_current_user_id():
+            return
+
+        self.bot.delete_message(chat_id, message_id)
+
+        text1 = 'kristal'
+        text2 = 'underfall'
+        text3 = 'victory'
+        text4 = 'havan'
+        text5 = 'other'
+
+        texts = [text1, text2, text3, text4, text5]
+        self.create_button_with_text(chat_id, 'Назад', texts[self.factions_index], 'back_to_factions')
 
     def next_menu_page(self, chat_id, message_id):
         self.bot.delete_message(chat_id, message_id)
@@ -220,8 +240,9 @@ class EchoBot:
     def create_buttons_with_image_for_factions(self, chat_id, text_in_keyboard: str, callback_name: str, photo_with_ex: str):
         markup = types.InlineKeyboardMarkup(row_width=1)
         keyboard1 = types.InlineKeyboardButton(text_in_keyboard, callback_data=callback_name)
-        keyboard2 = types.InlineKeyboardButton('Далее', callback_data='next')
-        markup.add(keyboard1, keyboard2)
+        keyboard2 = types.InlineKeyboardButton('Подробнее', callback_data='more_info')
+        keyboard3 = types.InlineKeyboardButton('Далее', callback_data='next')
+        markup.add(keyboard1, keyboard2, keyboard3)
         photo = open(f'images/{photo_with_ex}', 'rb')
         self.bot.send_photo(chat_id, photo, reply_markup=markup)
 
